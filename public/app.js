@@ -30,18 +30,14 @@ $(document).ready(function() {
     
     // Difference between now and arrival time of first train.
     var diffInTime = moment().diff(moment(firstTrainTime), "minutes");
-    
+        
     // Calculate Minutes Away.
     // Remainder of diffInTime / trainFreq, to find minutes away.
     var tRemainder = diffInTime % trainFreq;
-    
-    // Is outputting static minutes, no seconds.
-    // trainFreq - tRemainder needs to be an ISO string
     var minutesAway = trainFreq - tRemainder;
 
     // Calculate Next Arrival.  Should be every 15 min from first train arrival.
     // Should be current time + minutes away.
-    // Is outputting current time.
     var nextArrival = moment().add(minutesAway, "minutes");
 
     // Create object for holding train data.
@@ -49,7 +45,9 @@ $(document).ready(function() {
       name: trainName,
       destination: trainDest,
       start: firstTrainTime,
-      frequency: trainFreq
+      frequency: trainFreq,
+      next_arrival: moment(nextArrival).format("LT"),
+      minutes_away: moment(minutesAway).format("mm")
     };
 
     // Upload train data to database.
@@ -69,7 +67,7 @@ $(document).ready(function() {
       $("<td>").text(trainDest),
       $("<td>").text(trainFreq),
       $("<td>").text(moment(nextArrival).format("LT")),
-      $("<td>").text(moment(minutesAway).format("mm:ss"))
+      $("<td>").text(minutesAway)
     );
 
     // Append the new row to the table
@@ -81,6 +79,5 @@ $(document).ready(function() {
     $("#first-train-time-input").val("");
     $("#frequency-input").val("");
   });
-
 
 });
