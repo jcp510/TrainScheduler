@@ -21,8 +21,28 @@ $(document).ready(function() {
     // Capture user input
     var trainName = $("#train-name-input").val().trim();
     var trainDest = $("#destination-input").val().trim();
-    var firstTrainTime = moment($("#first-train-time-input").val().trim(), "MM/DD/YYYY").format("X");
+    var firstTrainTime = moment($("#first-train-time-input").val().trim(), "HH:mm").format("LLL");
     var trainFreq = $("#frequency-input").val().trim();
+    
+    // Next arrival = 
+    // (min now - min 1st arrival) -> (% modulus that number by 15 min interval) -> (15 min interval - modulus)
+    var currentTime = moment();
+    
+    // Difference between now and arrival time of first train.
+    var diffInTime = moment().diff(moment(firstTrainTime), "minutes");
+    
+    // Calculate Minutes Away.
+    // Remainder of diffInTime / trainFreq, to find minutes away.
+    var tRemainder = diffInTime % trainFreq;
+    
+    // Is outputting static minutes, no seconds.
+    // trainFreq - tRemainder needs to be an ISO string
+    var minutesAway = trainFreq - tRemainder;
+
+    // Calculate Next Arrival.  Should be every 15 min from first train arrival.
+    // Should be current time + minutes away.
+    // Is outputting current time.
+    var nextArrival = moment().add(minutesAway, "minutes");
 
     // Create object for holding train data.
     var newTrain = {
@@ -36,10 +56,10 @@ $(document).ready(function() {
     database.collection('trains').add(newTrain);
 
     // Log to console.
-    console.log(newTrain.name);
-    console.log(newTrain.destination);
-    console.log(newTrain.start);
-    console.log(newTrain.frequency);
+    console.log("name: " + newTrain.name);
+    console.log("destination: " + newTrain.destination);
+    console.log("first train time: " + newTrain.start);
+    console.log("frequency in minutes: " + newTrain.frequency);
 
     alert("Train successfully added");
 
@@ -48,8 +68,8 @@ $(document).ready(function() {
       $("<td>").text(trainName),
       $("<td>").text(trainDest),
       $("<td>").text(trainFreq),
-      // $("<td>").text(nextArrival),
-      // $("<td>").text(minAway)
+      $("<td>").text(moment(nextArrival).format("LT")),
+      $("<td>").text(moment(minutesAway).format("mm:ss"))
     );
 
     // Append the new row to the table
@@ -62,7 +82,5 @@ $(document).ready(function() {
     $("#frequency-input").val("");
   });
 
-    // Calculate Next Arrival.
 
-    // Calculate Minutes Away.
 });
